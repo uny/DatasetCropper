@@ -1,0 +1,18 @@
+resources
+    |
+    |-- Train
+        |
+        |-- d:annotations *
+        |-- d:neg *
+        |-- d:neg_cropped (default)
+        |-- d:pos *
+        |-- d:pos_person (default)
+        |
+        |-- annotations.lst *
+        |-- neg.lst *
+        |-- neg_cropped.lst (app makes)
+        |-- pos.lst *
+        |-- pos_person.lst (app makes)
+
+'d:' means directory
+'*' means you should copy from INRIA dataset
