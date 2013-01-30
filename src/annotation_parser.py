@@ -1,9 +1,6 @@
 __author__ = 'ynagai'
 __date__ = '29 Jan 2013'
 
-import sys
-import re
-
 from positive_info import PositiveInfo
 from person_info import PersonInfo
 
@@ -15,18 +12,14 @@ class AnnotationParser:
         pass
 
 
-    def _list_path(self, target=None):
+    def _list_path(self):
         """
         read list file and return the list
-        @param target option: annotations.lst, neg.lst, pos.lst
         @return annotation_list
         """
-        if target == None:
-            sys.stderr.write('target is not selected in _line_path method\n')
-            return []
-        filename = '../resources/Train/' + target
+        filename = '../resources/Train/annotations.lst'
         annotation_list = []
-        with open(name=filename, mode='r') as fin:
+        with open(filename, mode='r') as fin:
             line = fin.readline()
             while line:
                 annotation_list.append('../resources/' + line.strip())
@@ -104,7 +97,7 @@ class AnnotationParser:
         # return value
         annotation_list = []
 
-        for annotation_name in self._list_path(target='annotations.lst'):
+        for annotation_name in self._list_path():
             annotation_list.append(self._parse_annotation_info(annotation_name))
 
         return annotation_list

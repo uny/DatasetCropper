@@ -158,3 +158,20 @@ class PositiveCropper:
             annotation = self._narrow_roi_region(annotation)
             annotation = self._check_region(annotation)
             self._crop_image_with_annotation_and_resize(annotation)
+
+
+    def width_average(self):
+        """
+        calculate the average of image width
+        """
+        annotation_parser = AnnotationParser()
+        annotation_list = annotation_parser.parse()
+
+        sum = 0
+        count = 0
+
+        for annotation in annotation_list:
+            for person_info in annotation.people:
+                sum += person_info.max_x - person_info.min_x
+                count += 1
+        print float(sum) / count

@@ -5,6 +5,7 @@ import cv2
 import sys
 
 from positive_cropper import PositiveCropper
+from negative_cropper import NegativeCropper
 
 class App:
     """
@@ -17,6 +18,8 @@ class App:
     def run(self):
         positive_cropper = PositiveCropper()
         positive_cropper.crop()
+        negative_cropper = NegativeCropper()
+        negative_cropper.crop()
 
 
 if __name__ == '__main__':
