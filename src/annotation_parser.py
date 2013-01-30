@@ -34,63 +34,77 @@ class AnnotationParser:
         return  annotation_list
 
 
-    def _parse_annotation_info(self):
+    def _parse_annotation_info(self, filename):
         """
         parse annotation information
-        @return annotation_info information list of annotations
+        @return positive_info information of parsed positive annotation
         """
-        # return value
-        annotation_info = []
-
-        annotation_list = self._list_path(target='annotations.lst')
-        for annotation_name in annotation_list:
-            with open(name=annotation_name, mode='r') as fin:
+        with open(name=filename, mode='r') as fin:
+            line = fin.readline()
+            # image filename
+            while line:
+                if line.startswith('Image filename'):
+                    image_name = line.split('"')[1]
+                    positive_info = PositiveInfo(image_name=image_name)
+                    line = fin.readline()
+                    break
                 line = fin.readline()
-                # image filename
+            # image size
+            while line:
+                if line.startswith('Image size'):
+                    image_size = line.split(' : ')[1].split(' x ')
+                    image_size = (int(image_size[0]), int(image_size[1]), int(image_size[2]))
+                    positive_info.image_size = image_size
+                    line = fin.readline()
+                    break
+                line = fin.readline()
+            # the number of objects
+            while line:
+                if line.startswith('Objects with ground truth'):
+                    num_objects = int(line.split(' ')[5])
+                    line = fin.readline()
+                    break
+                line = fin.readline()
+            # people
+            for index in range(1, num_objects + 1):
+                person_info = PersonInfo()
                 while line:
-                    if line.startswith('Image filename'):
-                        image_name = line.split('"')[1]
-                        positive_info = PositiveInfo(image_name=image_name)
+                    if line.startswith('Center point on object %d ' % index):
+                        # return value as '['X', 'Y)']'
+                        center_info = line.split(': (')[1].split(', ')
+                        person_info.center_x = int(center_info[0])
+                        # get value as '\d+)'
+                        person_info.center_y = int(center_info[1][:-2])
                         line = fin.readline()
+
+                    if line.startswith('Bounding box for object %d ' % index):
+                        # return value as '['Xmin, Ymin', 'Xmax, Ymax)']'
+                        rect = line.split(': (')[1].split(') - (')
+
+                        rect_min = rect[0].split(', ')
+                        person_info.min_x = int(rect_min[0])
+                        person_info.min_y = int(rect_min[1])
+
+                        rect_max = rect[1].split(', ')
+                        person_info.max_x = int(rect_max[0])
+                        person_info.max_y = int(rect_max[1][:-2])
+
+                        positive_info.people.append(person_info)
+                        # next person index
                         break
                     line = fin.readline()
-                # the number of objects
-                while line:
-                    if line.startswith('Objects with ground truth'):
-                        num_objects = int(line.split(' ')[5])
-                        line = fin.readline()
-                        break
-                    line = fin.readline()
-                # people
-                for index in range(1, num_objects + 1):
-                    person_info = PersonInfo()
-                    while line:
-                        if line.startswith('Center point on object %d ' % index):
-                            # return value as '['X', 'Y)']'
-                            center_info = line.split(': (')[1].split(', ')
-                            person_info.center_x = int(center_info[0])
-                            # get value as '\d+)'
-                            person_info.center_y = int(center_info[1][:len(center_info[1]) - 2])
-                            line = fin.readline()
-
-                        if line.startswith('Bounding box for object %d ' % index):
-                            # return value as '['Xmin, Ymin', 'Xmax, Ymax)']'
-                            rect = line.split(': (')[1].split(') - (')
-
-                            rect_min = rect[0].split(', ')
-                            person_info.min_x = int(rect_min[0])
-                            person_info.min_y = int(rect_min[1])
-
-                            rect_max = rect[1].split(', ')
-                            person_info.max_x = int(rect_max[0])
-                            person_info.max_y = int(rect_max[1][:len(rect_max[1]) - 2])
-
-                            positive_info.people.append(person_info)
-                            break
-                        line = fin.readline()
-            annotation_info.append(positive_info)
-        return annotation_info
+        return positive_info
 
 
     def parse(self):
-        self._parse_annotation_info()
+        """
+        parse given annotations
+        @return annotation_list all given parsed annotation list for positive
+        """
+        # return value
+        annotation_list = []
+
+        for annotation_name in self._list_path(target='annotations.lst'):
+            annotation_list.append(self._parse_annotation_info(annotation_name))
+
+        return annotation_list
