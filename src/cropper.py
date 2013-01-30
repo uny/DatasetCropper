@@ -4,7 +4,7 @@ __date__ = '29 Jan 2013'
 import cv2
 import sys
 
-from annotation_parser import AnnotationParser
+from positive_cropper import PositiveCropper
 
 class App:
     """
@@ -15,8 +15,8 @@ class App:
         pass
 
     def run(self):
-        annotation_parser = AnnotationParser()
-        annotation_parser.parse()
+        positive_cropper = PositiveCropper()
+        positive_cropper.crop()
 
 
 if __name__ == '__main__':
