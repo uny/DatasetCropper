@@ -11,7 +11,7 @@ class PositiveCropper:
     """
 
     _HEAD_Y = 0.112731
-    _LST_NAME = '../resources/pos_person.lst'
+    _LST_NAME = '../resources/Train/pos_person.lst'
 
     def __init__(self):
         pass
