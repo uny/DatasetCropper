@@ -37,8 +37,11 @@ class AnnotationParser:
     def _parse_annotation_info(self):
         """
         parse annotation information
-        @return
+        @return annotation_info information list of annotations
         """
+        # return value
+        annotation_info = []
+
         annotation_list = self._list_path(target='annotations.lst')
         for annotation_name in annotation_list:
             with open(name=annotation_name, mode='r') as fin:
@@ -60,17 +63,33 @@ class AnnotationParser:
                     line = fin.readline()
                 # people
                 for index in range(1, num_objects + 1):
+                    person_info = PersonInfo()
                     while line:
-                        if line.startswith('Center point on object %d' % index):
-                            # TODO: parse here
-                            pass
-#            image_name = re.search(pattern=r'Image filename : "([\w\./]+)"', string=content).group(1)
-#            positive_info = PositiveInfo(image_name=image_name)
-#            num_objects = int(re.search(pattern=r'Objects with ground truth : (\d+)', string=content).group(1))
-#            for index in range(1, num_objects + 1):
-#                pattern = r'Center point on object %d "PASperson" \(X, Y\) : \((\d+), (\d+)\)' % index
-#                match = re.search(pattern=pattern, string=content)
+                        if line.startswith('Center point on object %d ' % index):
+                            # return value as '['X', 'Y)']'
+                            center_info = line.split(': (')[1].split(', ')
+                            person_info.center_x = int(center_info[0])
+                            # get value as '\d+)'
+                            person_info.center_y = int(center_info[1][:len(center_info[1]) - 2])
+                            line = fin.readline()
 
+                        if line.startswith('Bounding box for object %d ' % index):
+                            # return value as '['Xmin, Ymin', 'Xmax, Ymax)']'
+                            rect = line.split(': (')[1].split(') - (')
+
+                            rect_min = rect[0].split(', ')
+                            person_info.min_x = int(rect_min[0])
+                            person_info.min_y = int(rect_min[1])
+
+                            rect_max = rect[1].split(', ')
+                            person_info.max_x = int(rect_max[0])
+                            person_info.max_y = int(rect_max[1][:len(rect_max[1]) - 2])
+
+                            positive_info.people.append(person_info)
+                            break
+                        line = fin.readline()
+            annotation_info.append(positive_info)
+        return annotation_info
 
 
     def parse(self):

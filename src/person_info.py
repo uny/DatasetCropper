@@ -6,8 +6,8 @@ class PersonInfo:
     """
     just for data structure of information of a person
     """
-    def __init__(self, center_x, center_y,
-                 min_x, min_y, max_x, max_y):
+    def __init__(self, center_x=None, center_y=None,
+                 min_x=None, min_y=None, max_x=None, max_y=None):
         """
         declaration for structure
         @param center_x head position x
